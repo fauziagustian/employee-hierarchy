@@ -87,6 +87,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>employe-hierarchy-images</finalName>
 	</build>
 	<repositories>
 		<repository>
