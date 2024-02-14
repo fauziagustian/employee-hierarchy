@@ -3,7 +3,7 @@ package com.evidencecare.employee;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = EmployeeApplication.class)
 class EmployeeApplicationTests {
 
 	@Test
