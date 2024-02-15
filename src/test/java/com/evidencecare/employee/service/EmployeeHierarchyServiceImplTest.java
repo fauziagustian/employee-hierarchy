@@ -31,6 +31,7 @@ class EmployeeHierarchyServiceImplTest {
 
 	private List<Employee> testEmployees = new ArrayList<Employee>();
 
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -55,12 +56,22 @@ class EmployeeHierarchyServiceImplTest {
 	}
 
 	@Test
-	void testGetManagersHierarchy() {
+	void testGetManagersHierarchy_success() {
 		employeeHierarchyService.getEmployees().addAll(testEmployees);
 		assertEquals(Arrays.asList("Alice", "Bob"),
 				employeeHierarchyService.getManagersHierarchy(testEmployees.get(0)));
+	}
+
+	@Test
+	void testGetManagersHierarchy_managerNotfound() {
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
 		assertThrows(ManagerNotFoundException.class,
 				() -> employeeHierarchyService.getManagersHierarchy(new Employee(4, "New", 5)));
+	}
+
+	@Test
+	void testGetManagersHierarchy_noHierarchy() {
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
 		assertThrows(NoHierarchyException.class,
 				() -> employeeHierarchyService.getManagersHierarchy(testEmployees.get(2)));
 	}
