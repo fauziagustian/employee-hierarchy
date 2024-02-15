@@ -26,33 +26,42 @@ public class EmployeeHierarchyController {
 
 	@GetMapping("/{name}")
 	public ResponseEntity<Map<String, Object>> getEmployeeHierarchy(@PathVariable String name) {
-		Employee employee = employeeHierarchyService.findEmployeeByName(name);
-		if (employee == null) {
-			return ResponseEntity.notFound().build();
+		try {
+			Employee employee = employeeHierarchyService.findEmployeeByName(name);
+			if (employee == null) {
+				return ResponseEntity.notFound().build();
+			}
+			List<String> managersHierarchy = employeeHierarchyService.getManagersHierarchy(employee);
+			if (employeeHierarchyService.isDuplicateNameEmployee(name)) {
+				StringBuilder managerNames = new StringBuilder();
+				AtomicInteger i = new AtomicInteger(1);
+				managersHierarchy.forEach(value -> {
+					if (i.get() != managersHierarchy.size()) {
+						managerNames.append(value).append(", ");
+					}
+					else {
+						managerNames.append(value);
+					}
+					i.incrementAndGet();
+				});
+				String result = managerNames.toString();
+				throw new MultipleManagersException(
+						"Unable to process employee tree. " + employee.getName() + " has multiple managers: " + result);
+			}
+			int totalReports = employeeHierarchyService.getTotalDirectAndIndirectReports(employee);
+			Map<String, Object> response = new HashMap<>();
+			response.put("employee", employee.getName());
+			response.put("managersHierarchy", managersHierarchy);
+			response.put("totalReports", totalReports);
+			return ResponseEntity.ok(response);
 		}
-		List<String> managersHierarchy = employeeHierarchyService.getManagersHierarchy(employee);
-		if (employeeHierarchyService.isDuplicateNameEmployee(name)) {
-			StringBuilder managerNames = new StringBuilder();
-			AtomicInteger i = new AtomicInteger(1);
-			managersHierarchy.forEach(value -> {
-				if (i.get() != managersHierarchy.size()) {
-					managerNames.append(value).append(", ");
-				}
-				else {
-					managerNames.append(value);
-				}
-				i.incrementAndGet();
-			});
-			String result = managerNames.toString();
-			throw new MultipleManagersException(
-					"Unable to process employee tree. " + employee.getName() + " has multiple managers: " + result);
+		catch (MultipleManagersException e) {
+			// Handle the exception and return an appropriate response
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("error", "Multiple Managers Found");
+			errorResponse.put("message", e.getMessage());
+			return ResponseEntity.badRequest().body(errorResponse);
 		}
-		int totalReports = employeeHierarchyService.getTotalDirectAndIndirectReports(employee);
-		Map<String, Object> response = new HashMap<>();
-		response.put("employee", employee.getName());
-		response.put("managersHierarchy", managersHierarchy);
-		response.put("totalReports", totalReports);
-		return ResponseEntity.ok(response);
 	}
 
 }

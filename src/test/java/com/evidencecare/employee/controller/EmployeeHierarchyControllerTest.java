@@ -1,81 +1,90 @@
 package com.evidencecare.employee.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.evidencecare.employee.dto.Employee;
-import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyServiceImpl;
-import com.evidencecare.employee.util.MultipleManagersException;
+import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyService;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EmployeeHierarchyControllerTest {
 
-	private final EmployeeHierarchyServiceImpl employeeHierarchyService = Mockito.mock(EmployeeHierarchyServiceImpl.class);
+@ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc
+class EmployeeHierarchyControllerTest {
+
+	private MockMvc mockMvc;
+
+	@Mock
+	private EmployeeHierarchyService employeeHierarchyService;
 
 	@InjectMocks
 	private EmployeeHierarchyController employeeHierarchyController;
 
-	@SuppressWarnings("null")
-	@Test
-	public void testGetEmployeeHierarchy_Success() {
-		// Test case for successful retrieval of employee hierarchy
-		String name = "Evelina";
-		Employee employee = new Employee();
-		employee.setName(name);
-		List<String> managersHierarchy = Arrays.asList("Eveleen", "Kacie", "Raelynn");
-		int totalReports = 5; // Sample total reports count
-		when(employeeHierarchyService.findEmployeeByName(name)).thenReturn(employee);
-		when(employeeHierarchyService.getManagersHierarchy(employee)).thenReturn(managersHierarchy);
-		when(employeeHierarchyService.getTotalDirectAndIndirectReports(employee)).thenReturn(totalReports);
-
-		ResponseEntity<Map<String, Object>> responseEntity = employeeHierarchyController.getEmployeeHierarchy(name);
-
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertNotNull(responseEntity.getBody());
-		assertEquals(name, responseEntity.getBody().get("employee"));
-		assertEquals(managersHierarchy, responseEntity.getBody().get("managersHierarchy"));
-		assertEquals(totalReports, responseEntity.getBody().get("totalReports"));
+	@BeforeEach
+	void setUp() {
+		mockMvc = MockMvcBuilders.standaloneSetup(employeeHierarchyController).build();
 	}
 
 	@Test
-	public void testGetEmployeeHierarchy_NotFound() {
-		// Test case for scenario when employee is not found
-		String name = "NonExistingEmployee";
-		when(employeeHierarchyService.findEmployeeByName(name)).thenReturn(null);
+	void testGetEmployeeHierarchy_Success() throws Exception {
+		// Mocking employeeHierarchyService to return sample data
+		Employee mockEmployee = new Employee();
+		mockEmployee.setId(1);
+		mockEmployee.setName("John");
+		mockEmployee.setManagerId(1);
+		List<String> mockManagersHierarchy = Arrays.asList("Manager1", "Manager2");
+		int mockTotalReports = 5;
+		when(employeeHierarchyService.findEmployeeByName(anyString())).thenReturn(mockEmployee);
+		when(employeeHierarchyService.getManagersHierarchy(any())).thenReturn(mockManagersHierarchy);
+		when(employeeHierarchyService.getTotalDirectAndIndirectReports(any())).thenReturn(mockTotalReports);
 
-		ResponseEntity<Map<String, Object>> responseEntity = employeeHierarchyController.getEmployeeHierarchy(name);
+		// Performing the request and verifying the response
+		mockMvc.perform(MockMvcRequestBuilders.get("/employees/John"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andReturn();
+		verify(employeeHierarchyService).findEmployeeByName(anyString());
 
-		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody());
 	}
 
 	@Test
-	public void testGetEmployeeHierarchy_MultipleManagersException() {
-		// Test case for scenario when employee has multiple managers
-		String name = "EmployeeWithMultipleManagers";
-		Employee employee = new Employee();
-		employee.setName(name);
-		when(employeeHierarchyService.findEmployeeByName(name)).thenReturn(employee);
-		when(employeeHierarchyService.isDuplicateNameEmployee(name)).thenReturn(true);
+	void testGetEmployeeHierarchy_MultipleManagers() throws Exception {
+		Employee mockEmployee = new Employee();
+		mockEmployee.setId(1);
+		mockEmployee.setName("John");
+		mockEmployee.setManagerId(1);
+		List<String> mockManagersHierarchy = Arrays.asList("Manager1", "Manager2");
+		when(employeeHierarchyService.findEmployeeByName(anyString())).thenReturn(mockEmployee);
+		when(employeeHierarchyService.getManagersHierarchy(any())).thenReturn(mockManagersHierarchy);
+		when(employeeHierarchyService.isDuplicateNameEmployee(anyString())).thenReturn(true);
 
-		assertThrows(MultipleManagersException.class, () -> {
-			employeeHierarchyController.getEmployeeHierarchy(name);
-		});
+		mockMvc.perform(MockMvcRequestBuilders.get("/employees/John"))
+			.andExpect(MockMvcResultMatchers.status().isBadRequest())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Multiple Managers Found"))
+			.andReturn();
+	}
+
+	@Test
+	void testGetEmployeeHierarchy_nameNotfound() throws Exception {
+		when(employeeHierarchyService.findEmployeeByName(anyString())).thenReturn(null);
+		mockMvc.perform(MockMvcRequestBuilders.get("/employees/John"))
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andReturn();
 	}
 
 }

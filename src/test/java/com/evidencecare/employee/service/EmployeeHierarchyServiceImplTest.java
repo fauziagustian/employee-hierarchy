@@ -1,92 +1,84 @@
 package com.evidencecare.employee.service;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.evidencecare.employee.dto.Employee;
 import com.evidencecare.employee.service.dataload.DataLoadService;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyServiceImpl;
+import com.evidencecare.employee.util.ManagerNotFoundException;
+import com.evidencecare.employee.util.NoHierarchyException;
 
-@ExtendWith(SpringExtension.class)
-public class EmployeeHierarchyServiceImplTest {
+class EmployeeHierarchyServiceImplTest {
 
-	private final DataLoadService dataLoadService = Mockito.mock(DataLoadService.class);
+	@Mock
+	private DataLoadService dataLoadService;
 
-	private final EmployeeHierarchyServiceImpl employeeHierarchyServiceImpl = new EmployeeHierarchyServiceImpl(
-			dataLoadService, null);
+	private EmployeeHierarchyServiceImpl employeeHierarchyService;
 
-	@Test
-	public void testLoadData() {
-		// Test case for successful loading of data
-		List<Employee> employees = new ArrayList<>();
-		Employee employee1 = new Employee();
-		employee1.setId(1);
-		employee1.setName("Employee 1");
-		employee1.setManagerId(null);
-		employees.add(employee1);
+	private List<Employee> testEmployees = new ArrayList<Employee>();
 
-		// Mocking the behavior of the dataLoadService to return the test data
-		when(dataLoadService.loadEmployeesFromFile()).thenReturn(employees);
-
-		// Call the loadData method
-		employeeHierarchyServiceImpl.loadData();
-
-		// Assert that the employees list is loaded correctly
-		assertEquals(1, employeeHierarchyServiceImpl.getEmployees().size());
-		assertEquals(employee1, employeeHierarchyServiceImpl.getEmployees().get(0));
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.initMocks(this);
+		testEmployees = Arrays.asList(new Employee(1, "John", 2), new Employee(2, "Alice", 3),
+				new Employee(3, "Bob", null));
+		employeeHierarchyService = new EmployeeHierarchyServiceImpl(dataLoadService, testEmployees);
+		employeeHierarchyService.loadData();
 	}
 
 	@Test
-	public void testFindEmployeeByName_Found() {
-		// Test case for scenario when employee is found
-		List<Employee> employees = new ArrayList<>();
-		Employee employee1 = new Employee();
-		employee1.setId(1);
-		employee1.setName("Employee 1");
-		employees.add(employee1);
+    void testLoadData() {
+        when(dataLoadService.loadEmployeesFromFile()).thenReturn(testEmployees);
+        employeeHierarchyService.loadData();
+        assertEquals(testEmployees, employeeHierarchyService.getEmployees());
+    }
 
-		// Mocking the behavior of the dataLoadService to return the test data
-		when(dataLoadService.loadEmployeesFromFile()).thenReturn(employees);
-
-		// Call the loadData method
-		employeeHierarchyServiceImpl.loadData();
-
-		// Call the findEmployeeByName method
-		Employee foundEmployee = employeeHierarchyServiceImpl.findEmployeeByName("Employee 1");
-
-		// Assert that the correct employee is found
-		assertEquals(employee1, foundEmployee);
+	@Test
+	void testFindEmployeeByName() {
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
+		assertEquals(testEmployees.get(0), employeeHierarchyService.findEmployeeByName("John"));
+		assertNull(employeeHierarchyService.findEmployeeByName("Unknown"));
 	}
 
 	@Test
-	public void testFindEmployeeByName_NotFound() {
-		// Test case for scenario when employee is not found
-		List<Employee> employees = new ArrayList<>();
-		Employee employee1 = new Employee();
-		employee1.setId(1);
-		employee1.setName("Employee 1");
-		employees.add(employee1);
+	void testGetManagersHierarchy() {
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
+		assertEquals(Arrays.asList("Alice", "Bob"),
+				employeeHierarchyService.getManagersHierarchy(testEmployees.get(0)));
+		assertThrows(ManagerNotFoundException.class,
+				() -> employeeHierarchyService.getManagersHierarchy(new Employee(4, "New", 5)));
+		assertThrows(NoHierarchyException.class,
+				() -> employeeHierarchyService.getManagersHierarchy(testEmployees.get(2)));
+	}
 
-		// Mocking the behavior of the dataLoadService to return the test data
-		when(dataLoadService.loadEmployeesFromFile()).thenReturn(employees);
+	@Test
+	void testGetTotalDirectAndIndirectReports() {
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
+		assertEquals(0, employeeHierarchyService.getTotalDirectAndIndirectReports(testEmployees.get(0)));
+		assertEquals(1, employeeHierarchyService.getTotalDirectAndIndirectReports(testEmployees.get(1)));
+		assertEquals(2, employeeHierarchyService.getTotalDirectAndIndirectReports(testEmployees.get(2)));
+	}
 
-		// Call the loadData method
-		employeeHierarchyServiceImpl.loadData();
-
-		// Call the findEmployeeByName method with a non-existing name
-		Employee foundEmployee = employeeHierarchyServiceImpl.findEmployeeByName("NonExistingEmployee");
-
-		// Assert that no employee is found
-		assertNull(foundEmployee);
+	@Test
+	void testIsDuplicateNameEmployee() {
+		testEmployees = Arrays.asList(new Employee(1, "John", 2), new Employee(1, "John", 2));
+		employeeHierarchyService.getEmployees().addAll(testEmployees);
+		assertTrue(employeeHierarchyService.isDuplicateNameEmployee("John"));
+		assertFalse(employeeHierarchyService.isDuplicateNameEmployee("Unknown"));
 	}
 
 }

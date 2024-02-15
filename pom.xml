@@ -55,6 +55,11 @@
 			<version>4.13.2</version> <!-- or the latest version -->
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -70,18 +75,23 @@
 				<configuration>
 					<excludes>
 						<exclude>**/util/**</exclude>
-						<exclude>**/controllers/**</exclude>
 					</excludes>
+					<includes>
+						<include>com/evidencecare/employee/controller/**</include>
+						<include>com/evidencecare/employee/service/**</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
+						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
+						<phase>test-compile</phase>
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>prepare-package</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
