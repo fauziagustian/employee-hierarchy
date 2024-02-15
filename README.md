@@ -36,8 +36,14 @@
 1. run this command "docker pull fauzidockerhub/employe-hierarchy-images:latest"
 
 # open swagger
-1. go on browser and open this url : http://localhost:8080/employee-hierarchy/swagger-ui/index.html
-2. execute if you want test service apps
+1. you must running apps before open swagger
+2. go on browser and open this url : http://localhost:8080/employee-hierarchy/swagger-ui/index.html
+3. execute if you want test service apps
+
+here is the screenshoot : 
+![image](https://github.com/fauziagustian/employee-hierarchy/assets/64592796/5e204864-89ac-48ec-9914-8c72d77d9510)
+
+   
 
 # sample of request and response : 
 1. evelina
