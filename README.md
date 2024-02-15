@@ -42,7 +42,8 @@
 1. evelina
   - request : http://localhost:8080/employee-hierarchy/employees/evelina
   - response :
-```json {
+```json
+{
   "totalReports": 0,
   "employee": "evelina",
   "managersHierarchy": [
