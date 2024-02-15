@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.evidencecare.employee.dto.Employee;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyService;
 
-
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class EmployeeHierarchyControllerTest {
@@ -83,7 +82,8 @@ class EmployeeHierarchyControllerTest {
 	void testGetEmployeeHierarchy_nameNotfound() throws Exception {
 		when(employeeHierarchyService.findEmployeeByName(anyString())).thenReturn(null);
 		mockMvc.perform(MockMvcRequestBuilders.get("/employees/John"))
-			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.status().isBadRequest())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Employee not found"))
 			.andReturn();
 	}
 

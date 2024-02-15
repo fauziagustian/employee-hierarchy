@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.evidencecare.employee.dto.Employee;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyService;
+import com.evidencecare.employee.util.EmployeeNotFoundException;
 import com.evidencecare.employee.util.MultipleManagersException;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class EmployeeHierarchyController {
 		try {
 			Employee employee = employeeHierarchyService.findEmployeeByName(name);
 			if (employee == null) {
-				return ResponseEntity.notFound().build();
+				throw new EmployeeNotFoundException("the employee : " + name + " does not exist");
 			}
 			List<String> managersHierarchy = employeeHierarchyService.getManagersHierarchy(employee);
 			if (employeeHierarchyService.isDuplicateNameEmployee(name)) {
@@ -54,6 +55,13 @@ public class EmployeeHierarchyController {
 			response.put("managersHierarchy", managersHierarchy);
 			response.put("totalReports", totalReports);
 			return ResponseEntity.ok(response);
+		}
+		catch (EmployeeNotFoundException e) {
+			// Handle the exception and return an appropriate response
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("error", "Employee not found");
+			errorResponse.put("message", e.getMessage());
+			return ResponseEntity.badRequest().body(errorResponse);
 		}
 		catch (MultipleManagersException e) {
 			// Handle the exception and return an appropriate response

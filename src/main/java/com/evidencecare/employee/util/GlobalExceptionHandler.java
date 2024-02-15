@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler({ ManagerNotFoundException.class, NoHierarchyException.class, EmployeeNotFoundException.class,
-			ManagerNotFoundException.class })
+	@ExceptionHandler({ ManagerNotFoundException.class, NoHierarchyException.class, ManagerNotFoundException.class })
 	public ResponseEntity<Object> handleEmployeeHierarchyException(Exception ex) {
 		Map<String, Object> errorResponse = new HashMap<>();
 		errorResponse.put("error", "Employee Hierarchy Error");
