@@ -31,6 +31,9 @@
 3. write on your command line using bash or powershell : "mvn clean install"
 4. after that run command line "mvn spring-boot:run"
 
+# pull my docker image from docker hub
+1. run this command "docker pull fauzidockerhub/employe-hierarchy-images:latest"
+
 # open swagger
 1. go on browser and open this url : http://localhost:8080/employee-hierarchy/swagger-ui/index.html
 2. execute if you want test service apps
