@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.evidencecare.employee.dto.Employee;
+import com.evidencecare.employee.model.Employee;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyService;
 import com.evidencecare.employee.util.EmployeeNotFoundException;
 import com.evidencecare.employee.util.MultipleManagersException;

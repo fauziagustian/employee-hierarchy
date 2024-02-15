@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.evidencecare.employee.dto.Employee;
+import com.evidencecare.employee.model.Employee;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyService;
 
 @ExtendWith(MockitoExtension.class)

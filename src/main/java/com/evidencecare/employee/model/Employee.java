@@ -1,4 +1,4 @@
-package com.evidencecare.employee.dto;
+package com.evidencecare.employee.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

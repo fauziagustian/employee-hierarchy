@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.evidencecare.employee.dto.Employee;
+import com.evidencecare.employee.model.Employee;
 import com.evidencecare.employee.service.dataload.DataLoadService;
 import com.evidencecare.employee.service.employeehierarchy.EmployeeHierarchyServiceImpl;
 import com.evidencecare.employee.util.ManagerNotFoundException;

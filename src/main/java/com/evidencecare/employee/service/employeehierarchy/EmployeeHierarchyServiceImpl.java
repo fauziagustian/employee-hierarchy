@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.evidencecare.employee.dto.Employee;
+import com.evidencecare.employee.model.Employee;
 import com.evidencecare.employee.service.dataload.DataLoadService;
 import com.evidencecare.employee.util.ManagerNotFoundException;
 import com.evidencecare.employee.util.NoHierarchyException;
