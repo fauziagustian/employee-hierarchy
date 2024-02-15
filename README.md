@@ -99,7 +99,7 @@
 ![image](https://github.com/fauziagustian/employee-hierarchy/assets/64592796/813de6dc-b703-423a-a141-40157ddeb734)
 
 # sonarlint
-i have using sonarlint in my code editor, this code is 100% is clean and don't have sonarlint comment or notification
+i have using sonarlint in my code editor, this code is 100% is clean and don't have sonarlint comment or notification from sonarlint.
 
 # screenshot sample of ci/cd in my github
 ![pipelines ](https://github.com/fauziagustian/employee-hierarchy/assets/64592796/89ab4c5e-5963-4c80-8343-7e5a1fdca988)
