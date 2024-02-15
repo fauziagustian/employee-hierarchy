@@ -27,9 +27,10 @@
 
 # running apps
 1. cloning this apps on you folder project : git clone https://github.com/fauziagustian/employee-hierarchy.git
-2. run commandline "cd ./employee-hierarchy"
-3. write on your command line using bash or powershell : "mvn clean install"
-4. after that run command line "mvn spring-boot:run"
+2. run command "cd ./employee-hierarchy"
+3. write on your command using bash or powershell : "mvn clean install"
+4. after that run command "mvn spring-boot:run"
+5. and the application has started.
 
 # pull my docker image from docker hub
 1. run this command "docker pull fauzidockerhub/employe-hierarchy-images:latest"
