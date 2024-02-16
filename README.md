@@ -60,7 +60,7 @@ here is the screenshoot :
   ]
 }
 ```
-3. martin
+2. martin
    - request : http://localhost:8080/employee-hierarchy/employees/evelina
    - response :
 ```json
@@ -69,7 +69,7 @@ here is the screenshoot :
   "message": "the employee : martin does not exist"
 }
 ```
-5. keane and kylee
+3. keane and kylee
    - request : http://localhost:8080/employee-hierarchy/employees/keane
    - response :
 ```json
@@ -86,7 +86,7 @@ here is the screenshoot :
   "message": "Unable to process employee hierarchy. kylee does not have any hierarchy."
 }
 ```
-6. linton
+4. linton
    - request : http://localhost:8080/employee-hierarchy/employees/linton
    - response :
 ```json
